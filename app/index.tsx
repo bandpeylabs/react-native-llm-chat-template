@@ -31,7 +31,12 @@ export default function ChatScreen() {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedModel, setSelectedModel] = useState('llama');
   const [showModelDropdown, setShowModelDropdown] = useState(false);
-  const [modelButtonLayout, setModelButtonLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [modelButtonLayout, setModelButtonLayout] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
   const flatListRef = useRef<FlatList>(null);
 
   const models = [
@@ -123,6 +128,10 @@ export default function ChatScreen() {
               alignItems: 'center',
             },
           ]}
+          onLayout={(event) => {
+            const { x, y, width, height } = event.nativeEvent.layout;
+            setModelButtonLayout({ x, y, width, height });
+          }}
           onPress={() => setShowModelDropdown(true)}
         >
           <Text
@@ -295,10 +304,16 @@ export default function ChatScreen() {
                 backgroundColor: theme.colors.surface,
                 borderRadius: theme.borderRadius.lg,
                 ...getWebSafeElevation(theme.elevation.lg),
+                position: 'absolute',
+                top: modelButtonLayout.y + modelButtonLayout.height + 8,
+                left: modelButtonLayout.x,
+                right: modelButtonLayout.x + modelButtonLayout.width,
+                maxWidth: 300,
+                minWidth: modelButtonLayout.width,
               },
             ]}
           >
-            {models.map((model) => (
+            {models.map((model, index) => (
               <TouchableOpacity
                 key={model.id}
                 style={[
@@ -306,7 +321,7 @@ export default function ChatScreen() {
                   {
                     paddingVertical: theme.spacing.md,
                     paddingHorizontal: theme.spacing.lg,
-                    borderBottomWidth: 1,
+                    borderBottomWidth: index === models.length - 1 ? 0 : 1,
                     borderBottomColor: theme.colors.divider,
                   },
                   model.id === selectedModel && {
@@ -407,13 +422,9 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
   },
   modelDropdown: {
-    width: '100%',
-    maxWidth: 300,
+    // Position and size are now set inline for dynamic positioning
   },
   modelOption: {
     flexDirection: 'row',
