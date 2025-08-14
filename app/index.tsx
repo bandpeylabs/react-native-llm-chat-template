@@ -10,15 +10,22 @@ import {
   Platform,
   SafeAreaView,
   Modal,
+  StatusBar,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ChatMessage from '@/src/components/ChatMessage';
 import TypingIndicator from '@/src/components/TypingIndicator';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ChatMessage as ChatMessageType } from '@/src/types/chat';
-import { useTheme, getWebSafeElevation } from '@/src/hooks/useTheme';
+import {
+  useTheme,
+  useIsDarkMode,
+  getWebSafeElevation,
+} from '@/src/hooks/useTheme';
 
 export default function ChatScreen() {
   const theme = useTheme();
+  const insets = useSafeAreaInsets();
   const [messages, setMessages] = useState<ChatMessageType[]>([
     {
       id: '1',
@@ -83,9 +90,14 @@ export default function ChatScreen() {
   const hasInputText = inputText.trim() !== '';
 
   return (
-    <SafeAreaView
+    <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
+      <StatusBar
+        barStyle={useIsDarkMode() ? 'light-content' : 'dark-content'}
+        backgroundColor={theme.colors.surface}
+        translucent={true}
+      />
       {/* Top Panel */}
       <View
         style={[
@@ -95,6 +107,7 @@ export default function ChatScreen() {
             borderBottomColor: theme.colors.divider,
             paddingHorizontal: theme.spacing.md,
             paddingVertical: theme.spacing.sm,
+            paddingTop: insets.top + theme.spacing.sm,
           },
         ]}
       >
@@ -371,7 +384,7 @@ export default function ChatScreen() {
           </View>
         </TouchableOpacity>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 }
 
