@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { ChatMessage as ChatMessageType } from '../types/chat';
-import { useTheme } from '../hooks/useTheme';
+import { useTheme, getWebSafeElevation } from '../hooks/useTheme';
 
 interface ChatMessageProps {
   message: ChatMessageType;
@@ -26,7 +26,7 @@ export default function ChatMessage({ message }: ChatMessageProps) {
               ? theme.colors.primary
               : theme.colors.surface,
             borderRadius: theme.borderRadius.lg,
-            ...theme.elevation.sm,
+            ...getWebSafeElevation(theme.elevation.sm),
           },
           isUser ? styles.userBubble : styles.aiBubble,
         ]}

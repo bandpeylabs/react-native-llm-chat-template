@@ -14,7 +14,7 @@ import ChatMessage from '@/src/components/ChatMessage';
 import TypingIndicator from '@/src/components/TypingIndicator';
 import SolarIcon from '@/src/components/SolarIcon';
 import { ChatMessage as ChatMessageType } from '@/src/types/chat';
-import { useTheme } from '@/src/hooks/useTheme';
+import { useTheme, getWebSafeElevation } from '@/src/hooks/useTheme';
 
 export default function ChatScreen() {
   const theme = useTheme();
@@ -61,6 +61,8 @@ export default function ChatScreen() {
     <ChatMessage message={item} />
   );
 
+  const hasInputText = inputText.trim() !== '';
+
   return (
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
@@ -96,6 +98,33 @@ export default function ChatScreen() {
             },
           ]}
         >
+          {/* Add Image Button */}
+          <TouchableOpacity
+            style={[
+              styles.addImageButton,
+              {
+                backgroundColor: theme.colors.surfaceVariant,
+                borderRadius: theme.borderRadius.full,
+                width: 40,
+                height: 40,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: theme.spacing.sm,
+              },
+            ]}
+            onPress={() => {
+              // TODO: Implement image picker
+              console.log('Add image pressed');
+            }}
+          >
+            <SolarIcon
+              name="image"
+              size={20}
+              color={theme.colors.text.secondary}
+            />
+          </TouchableOpacity>
+
+          {/* Text Input */}
           <TextInput
             style={[
               styles.textInput,
@@ -106,24 +135,26 @@ export default function ChatScreen() {
                 fontSize: theme.typography.body1.fontSize,
                 paddingHorizontal: theme.spacing.md,
                 paddingVertical: theme.spacing.sm,
+                flex: 1,
                 marginRight: theme.spacing.sm,
               },
             ]}
             value={inputText}
             onChangeText={setInputText}
-            placeholder="Type your message..."
+            placeholder="Ask anything..."
             placeholderTextColor={theme.colors.text.secondary}
             multiline
             maxLength={1000}
           />
+
+          {/* Send/Microphone Button */}
           <TouchableOpacity
             style={[
               styles.sendButton,
               {
-                backgroundColor:
-                  inputText.trim() === ''
-                    ? theme.colors.text.disabled
-                    : theme.colors.primary,
+                backgroundColor: hasInputText
+                  ? theme.colors.primary
+                  : theme.colors.surfaceVariant,
                 borderRadius: theme.borderRadius.full,
                 width: 40,
                 height: 40,
@@ -131,13 +162,23 @@ export default function ChatScreen() {
                 alignItems: 'center',
               },
             ]}
-            onPress={sendMessage}
-            disabled={inputText.trim() === ''}
+            onPress={
+              hasInputText
+                ? sendMessage
+                : () => {
+                    // TODO: Implement voice recording
+                    console.log('Voice recording pressed');
+                  }
+            }
           >
             <SolarIcon
-              name="send"
+              name={hasInputText ? 'send' : 'microphone'}
               size={20}
-              color={theme.colors.text.inverse}
+              color={
+                hasInputText
+                  ? theme.colors.text.inverse
+                  : theme.colors.text.secondary
+              }
             />
           </TouchableOpacity>
         </View>
@@ -164,8 +205,10 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     borderTopWidth: 1,
   },
+  addImageButton: {
+    // Styles applied inline for theme integration
+  },
   textInput: {
-    flex: 1,
     maxHeight: 100,
   },
   sendButton: {

@@ -78,7 +78,7 @@ export const borderRadius = {
   full: 9999,
 };
 
-// Material Design elevation (shadows)
+// Material Design elevation (shadows) - Web compatible
 export const elevation = {
   none: {
     shadowColor: 'transparent',
@@ -117,7 +117,7 @@ export const elevation = {
   },
 };
 
-// Typography scale (Material Design)
+// Typography scale (Material Design) - Web compatible
 export const typography = {
   h1: {
     fontSize: 32,
@@ -168,7 +168,6 @@ export const typography = {
     fontSize: 14,
     fontWeight: '500' as const,
     lineHeight: 20,
-    textTransform: 'uppercase' as const,
   },
 };
 
