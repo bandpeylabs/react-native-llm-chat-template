@@ -1,106 +1,50 @@
-# React Native LLM Chat Template
+# Welcome to your Expo app 👋
 
-A cross-platform mobile chat application template built with React Native for iOS and Android. This template provides a ChatGPT-like user interface with custom tweaks and adjustments, making it perfect for building AI-powered chat applications.
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## 🚀 Features
+## Get started
 
-- **Cross-Platform**: Works seamlessly on both iOS and Android
-- **ChatGPT-like UI**: Familiar chat interface with modern design
-- **Customizable**: Easy to modify and adapt for your specific needs
-- **React Native**: Built with the latest React Native framework
-- **Ready to Use**: Fork and start building immediately
-
-## 📱 Screenshots
-
-_Screenshots coming soon_
-
-## 🛠️ Getting Started
-
-### Prerequisites
-
-- Node.js (v16 or higher)
-- React Native CLI
-- Xcode (for iOS development)
-- Android Studio (for Android development)
-
-### Installation
-
-1. **Fork this repository**
-
-   ```bash
-   git clone https://github.com/your-username/react-native-llm-chat-template.git
-   cd react-native-llm-chat-template
-   ```
-
-2. **Install dependencies**
+1. Install dependencies
 
    ```bash
    npm install
-   # or
-   yarn install
    ```
 
-3. **iOS Setup**
+2. Start the app
 
    ```bash
-   cd ios
-   pod install
-   cd ..
+   npx expo start
    ```
 
-4. **Run the application**
+In the output, you'll find options to open the app in a
 
-   ```bash
-   # For iOS
-   npx react-native run-ios
+- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-   # For Android
-   npx react-native run-android
-   ```
+You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-## 🎨 Customization
+## Get a fresh project
 
-This template is designed to be easily customizable:
+When you're ready, run:
 
-- Modify the chat UI components in the `src/components` directory
-- Update styling in the theme files
-- Add your own LLM integration
-- Customize the chat behavior and features
-
-## 📁 Project Structure
-
-```
-src/
-├── components/     # Reusable UI components
-├── screens/        # Screen components
-├── navigation/     # Navigation configuration
-├── services/       # API and external services
-├── utils/          # Utility functions
-└── assets/         # Images, fonts, etc.
+```bash
+npm run reset-project
 ```
 
-## 🤝 Contributing
+This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## Learn more
 
-## 📄 License
+To learn more about developing your project with Expo, look at the following resources:
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
 
-## 🙏 Acknowledgments
+## Join the community
 
-- Built with React Native
-- Inspired by ChatGPT's user interface
-- Community contributions welcome
+Join our community of developers creating universal apps.
 
-## 📞 Support
-
-If you have any questions or need help with the template, please open an issue on GitHub.
-
----
-
-**Ready to build your next AI chat app? Fork this template and start coding! 🚀**
+- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
+- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
