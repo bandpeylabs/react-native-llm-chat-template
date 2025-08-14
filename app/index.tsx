@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  Modal,
 } from 'react-native';
 import ChatMessage from '@/src/components/ChatMessage';
 import TypingIndicator from '@/src/components/TypingIndicator';
@@ -28,7 +29,19 @@ export default function ChatScreen() {
   ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [selectedModel, setSelectedModel] = useState('llama');
+  const [showModelDropdown, setShowModelDropdown] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+
+  const models = [
+    { id: 'llama', name: 'Llama', description: "Meta's Llama model" },
+    { id: 'gpt4', name: 'GPT-4', description: "OpenAI's GPT-4 model" },
+    { id: 'gpt4o', name: 'GPT-4o', description: "OpenAI's GPT-4o model" },
+    { id: 'claude', name: 'Claude', description: "Anthropic's Claude model" },
+    { id: 'gemini', name: 'Gemini', description: "Google's Gemini model" },
+  ];
+
+  const currentModel = models.find((model) => model.id === selectedModel);
 
   const sendMessage = async () => {
     if (inputText.trim() === '') return;
@@ -67,6 +80,71 @@ export default function ChatScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
+      {/* Top Panel */}
+      <View
+        style={[
+          styles.topPanel,
+          {
+            backgroundColor: theme.colors.surface,
+            borderBottomColor: theme.colors.divider,
+            paddingHorizontal: theme.spacing.md,
+            paddingVertical: theme.spacing.sm,
+          },
+        ]}
+      >
+        {/* Burger Menu Button */}
+        <TouchableOpacity
+          style={[
+            styles.burgerButton,
+            {
+              marginRight: theme.spacing.md,
+            },
+          ]}
+          onPress={() => {
+            // TODO: Implement left drawer menu
+            console.log('Burger menu pressed');
+          }}
+        >
+          <SolarIcon
+            name="menu"
+            size={24}
+            color={theme.colors.text.primary}
+          />
+        </TouchableOpacity>
+
+        {/* Model Selector */}
+        <TouchableOpacity
+          style={[
+            styles.modelSelector,
+            {
+              flex: 1,
+              flexDirection: 'row',
+              alignItems: 'center',
+            },
+          ]}
+          onPress={() => setShowModelDropdown(true)}
+        >
+          <Text
+            style={[
+              styles.modelText,
+              {
+                color: theme.colors.text.primary,
+                ...theme.typography.body1,
+                fontWeight: '500',
+              },
+            ]}
+          >
+            Model {currentModel?.name}
+          </Text>
+          <SolarIcon
+            name="chevron-right"
+            size={16}
+            color={theme.colors.text.secondary}
+            style={{ marginLeft: theme.spacing.xs }}
+          />
+        </TouchableOpacity>
+      </View>
+
       <KeyboardAvoidingView
         style={styles.keyboardAvoidingView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -124,65 +202,159 @@ export default function ChatScreen() {
             />
           </TouchableOpacity>
 
-          {/* Text Input */}
-          <TextInput
+          {/* Text Input Container with Button Inside */}
+          <View
             style={[
-              styles.textInput,
+              styles.inputWrapper,
               {
                 backgroundColor: theme.colors.surfaceVariant,
                 borderRadius: theme.borderRadius.full,
-                color: theme.colors.text.primary,
-                fontSize: theme.typography.body1.fontSize,
+                flex: 1,
+                flexDirection: 'row',
+                alignItems: 'center',
                 paddingHorizontal: theme.spacing.md,
                 paddingVertical: theme.spacing.sm,
-                flex: 1,
-                marginRight: theme.spacing.sm,
               },
             ]}
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder="Ask anything..."
-            placeholderTextColor={theme.colors.text.secondary}
-            multiline
-            maxLength={1000}
-          />
-
-          {/* Send/Microphone Button */}
-          <TouchableOpacity
-            style={[
-              styles.sendButton,
-              {
-                backgroundColor: hasInputText
-                  ? theme.colors.primary
-                  : theme.colors.surfaceVariant,
-                borderRadius: theme.borderRadius.full,
-                width: 40,
-                height: 40,
-                justifyContent: 'center',
-                alignItems: 'center',
-              },
-            ]}
-            onPress={
-              hasInputText
-                ? sendMessage
-                : () => {
-                    // TODO: Implement voice recording
-                    console.log('Voice recording pressed');
-                  }
-            }
           >
-            <SolarIcon
-              name={hasInputText ? 'send' : 'microphone'}
-              size={20}
-              color={
-                hasInputText
-                  ? theme.colors.text.inverse
-                  : theme.colors.text.secondary
-              }
+            <TextInput
+              style={[
+                styles.textInput,
+                {
+                  color: theme.colors.text.primary,
+                  fontSize: theme.typography.body1.fontSize,
+                  flex: 1,
+                  textAlignVertical: 'center',
+                  paddingVertical: 0,
+                  marginRight: theme.spacing.sm,
+                },
+              ]}
+              value={inputText}
+              onChangeText={setInputText}
+              placeholder="Ask anything..."
+              placeholderTextColor={theme.colors.text.secondary}
+              multiline
+              maxLength={1000}
             />
-          </TouchableOpacity>
+
+            {/* Send/Microphone Button Inside Input */}
+            <TouchableOpacity
+              style={[
+                styles.sendButton,
+                {
+                  backgroundColor: hasInputText
+                    ? theme.colors.primary
+                    : 'transparent',
+                  borderRadius: theme.borderRadius.full,
+                  width: 32,
+                  height: 32,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                },
+              ]}
+              onPress={
+                hasInputText
+                  ? sendMessage
+                  : () => {
+                      // TODO: Implement voice recording
+                      console.log('Voice recording pressed');
+                    }
+              }
+            >
+              <SolarIcon
+                name={hasInputText ? 'send' : 'microphone'}
+                size={18}
+                color={
+                  hasInputText
+                    ? theme.colors.text.inverse
+                    : theme.colors.text.secondary
+                }
+              />
+            </TouchableOpacity>
+          </View>
         </View>
       </KeyboardAvoidingView>
+
+      {/* Model Selection Modal */}
+      <Modal
+        visible={showModelDropdown}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowModelDropdown(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowModelDropdown(false)}
+        >
+          <View
+            style={[
+              styles.modelDropdown,
+              {
+                backgroundColor: theme.colors.surface,
+                borderRadius: theme.borderRadius.lg,
+                ...getWebSafeElevation(theme.elevation.lg),
+              },
+            ]}
+          >
+            {models.map((model) => (
+              <TouchableOpacity
+                key={model.id}
+                style={[
+                  styles.modelOption,
+                  {
+                    paddingVertical: theme.spacing.md,
+                    paddingHorizontal: theme.spacing.lg,
+                    borderBottomWidth: 1,
+                    borderBottomColor: theme.colors.divider,
+                  },
+                  model.id === selectedModel && {
+                    backgroundColor: theme.colors.primary + '10',
+                  },
+                ]}
+                onPress={() => {
+                  setSelectedModel(model.id);
+                  setShowModelDropdown(false);
+                }}
+              >
+                <View style={styles.modelOptionContent}>
+                  <Text
+                    style={[
+                      styles.modelOptionName,
+                      {
+                        color: theme.colors.text.primary,
+                        ...theme.typography.body1,
+                        fontWeight: model.id === selectedModel ? '600' : '400',
+                      },
+                    ]}
+                  >
+                    {model.name}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.modelOptionDescription,
+                      {
+                        color: theme.colors.text.secondary,
+                        ...theme.typography.caption,
+                        marginTop: theme.spacing.xs,
+                      },
+                    ]}
+                  >
+                    {model.description}
+                  </Text>
+                </View>
+                {model.id === selectedModel && (
+                  <SolarIcon
+                    name="check"
+                    size={20}
+                    color={theme.colors.primary}
+                  />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -190,6 +362,20 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  topPanel: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+  },
+  burgerButton: {
+    // Styles applied inline for theme integration
+  },
+  modelSelector: {
+    // Styles applied inline for theme integration
+  },
+  modelText: {
+    // Styles applied inline for theme integration
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -208,10 +394,38 @@ const styles = StyleSheet.create({
   addImageButton: {
     // Styles applied inline for theme integration
   },
+  inputWrapper: {
+    // Styles applied inline for theme integration
+  },
   textInput: {
     maxHeight: 100,
   },
   sendButton: {
+    // Styles applied inline for theme integration
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modelDropdown: {
+    width: '100%',
+    maxWidth: 300,
+  },
+  modelOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  modelOptionContent: {
+    flex: 1,
+  },
+  modelOptionName: {
+    // Styles applied inline for theme integration
+  },
+  modelOptionDescription: {
     // Styles applied inline for theme integration
   },
 });
