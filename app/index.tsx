@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import ChatMessage from '@/src/components/ChatMessage';
 import TypingIndicator from '@/src/components/TypingIndicator';
-import SolarIcon from '@/src/components/SolarIcon';
+import { IconSymbol } from '@/components/ui/IconSymbol';
 import { ChatMessage as ChatMessageType } from '@/src/types/chat';
 import { useTheme, getWebSafeElevation } from '@/src/hooks/useTheme';
 
@@ -31,6 +31,7 @@ export default function ChatScreen() {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedModel, setSelectedModel] = useState('llama');
   const [showModelDropdown, setShowModelDropdown] = useState(false);
+  const [modelButtonLayout, setModelButtonLayout] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const flatListRef = useRef<FlatList>(null);
 
   const models = [
@@ -105,8 +106,8 @@ export default function ChatScreen() {
             console.log('Burger menu pressed');
           }}
         >
-          <SolarIcon
-            name="menu"
+          <IconSymbol
+            name="line.3.horizontal"
             size={24}
             color={theme.colors.text.primary}
           />
@@ -136,8 +137,8 @@ export default function ChatScreen() {
           >
             Model {currentModel?.name}
           </Text>
-          <SolarIcon
-            name="chevron-right"
+          <IconSymbol
+            name="chevron.right"
             size={16}
             color={theme.colors.text.secondary}
             style={{ marginLeft: theme.spacing.xs }}
@@ -195,8 +196,8 @@ export default function ChatScreen() {
               console.log('Add image pressed');
             }}
           >
-            <SolarIcon
-              name="image"
+            <IconSymbol
+              name="photo.fill"
               size={20}
               color={theme.colors.text.secondary}
             />
@@ -261,8 +262,8 @@ export default function ChatScreen() {
                     }
               }
             >
-              <SolarIcon
-                name={hasInputText ? 'send' : 'microphone'}
+              <IconSymbol
+                name={hasInputText ? 'paperplane.fill' : 'mic.fill'}
                 size={18}
                 color={
                   hasInputText
@@ -344,8 +345,8 @@ export default function ChatScreen() {
                   </Text>
                 </View>
                 {model.id === selectedModel && (
-                  <SolarIcon
-                    name="check"
+                  <IconSymbol
+                    name="checkmark"
                     size={20}
                     color={theme.colors.primary}
                   />

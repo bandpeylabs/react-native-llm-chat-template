@@ -68,7 +68,7 @@ _Screenshots coming soon_
 - **Expo Router** - File-based routing and navigation
 - **TypeScript** - Type-safe development
 - **Material Design** - Modern UI/UX principles
-- **Solar Icons** - Beautiful icon system
+- **Platform Icons** - Native SF Symbols (iOS) and Material Icons (Android)
 - **Expo** - Development platform and tools
 
 ## 🚀 Getting Started
@@ -117,7 +117,7 @@ react-native-llm-chat-template/
 │   ├── components/              # Reusable UI components
 │   │   ├── ChatMessage.tsx     # Message bubble component
 │   │   ├── TypingIndicator.tsx # Typing animation
-│   │   └── SolarIcon.tsx       # Icon component
+│   │   └── IconSymbol.tsx      # Platform-specific icon component
 │   ├── constants/               # App constants
 │   │   └── theme.ts            # Material Design theme system
 │   ├── hooks/                   # Custom React hooks
@@ -150,7 +150,7 @@ react-native-llm-chat-template/
 
 - **ChatMessage**: Beautiful message bubbles with timestamps
 - **TypingIndicator**: Animated typing dots
-- **SolarIcon**: Icon system with fallback support
+- **IconSymbol**: Platform-specific icons (SF Symbols for iOS, Material Icons for Android)
 
 ## 🔧 Customization
 
