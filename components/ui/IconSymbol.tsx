@@ -30,12 +30,18 @@ const MAPPING = {
   // Status icons
   'checkmark': 'check',
   'checkmark.circle.fill': 'check-circle',
+  'xmark': 'close',
+
+  // Settings icons
+  'gearshape': 'settings',
+  'paintbrush': 'palette',
+  'clock.arrow.circlepath': 'history',
+  'trash': 'delete',
+  'info.circle': 'info',
+  'questionmark.circle': 'help-outline',
 
   // UI icons
   'chevron.left.forwardslash.chevron.right': 'code',
-
-  // Default fallback
-  'questionmark.circle': 'help-outline',
 } as IconMapping;
 
 /**

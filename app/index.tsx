@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   Modal,
   StatusBar,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ChatMessage from '@/src/components/ChatMessage';
@@ -38,6 +39,7 @@ export default function ChatScreen() {
   const [isTyping, setIsTyping] = useState(false);
   const [selectedModel, setSelectedModel] = useState('llama');
   const [showModelDropdown, setShowModelDropdown] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
   const [modelButtonLayout, setModelButtonLayout] = useState({
     x: 0,
     y: 0,
@@ -45,6 +47,7 @@ export default function ChatScreen() {
     height: 0,
   });
   const flatListRef = useRef<FlatList>(null);
+  const drawerAnimation = useRef(new Animated.Value(-300)).current;
 
   const models = [
     { id: 'llama', name: 'Llama', description: "Meta's Llama model" },
@@ -89,6 +92,23 @@ export default function ChatScreen() {
 
   const hasInputText = inputText.trim() !== '';
 
+  // Drawer animation effects
+  useEffect(() => {
+    if (showDrawer) {
+      Animated.timing(drawerAnimation, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(drawerAnimation, {
+        toValue: -300,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [showDrawer, drawerAnimation]);
+
   return (
     <View
       style={[styles.container, { backgroundColor: theme.colors.background }]}
@@ -119,10 +139,7 @@ export default function ChatScreen() {
               marginRight: theme.spacing.md,
             },
           ]}
-          onPress={() => {
-            // TODO: Implement left drawer menu
-            console.log('Burger menu pressed');
-          }}
+          onPress={() => setShowDrawer(true)}
         >
           <IconSymbol
             name="line.3.horizontal"
@@ -247,9 +264,10 @@ export default function ChatScreen() {
                   color: theme.colors.text.primary,
                   fontSize: theme.typography.body1.fontSize,
                   flex: 1,
-                  textAlignVertical: 'center',
+                  textAlignVertical: inputText ? 'top' : 'center',
                   paddingVertical: 0,
                   marginRight: theme.spacing.sm,
+                  minHeight: 20,
                 },
               ]}
               value={inputText}
@@ -384,6 +402,241 @@ export default function ChatScreen() {
           </View>
         </TouchableOpacity>
       </Modal>
+
+      {/* Drawer Menu */}
+      {showDrawer && (
+        <View style={styles.drawerOverlay}>
+          <TouchableOpacity
+            style={styles.drawerBackground}
+            activeOpacity={1}
+            onPress={() => setShowDrawer(false)}
+          />
+          <Animated.View
+            style={[
+              styles.drawer,
+              {
+                backgroundColor: theme.colors.surface,
+                ...getWebSafeElevation(theme.elevation.xl),
+                transform: [{ translateX: drawerAnimation }],
+              },
+            ]}
+            onStartShouldSetResponder={() => true}
+            onTouchEnd={(e) => e.stopPropagation()}
+          >
+            {/* Drawer Header */}
+            <View
+              style={[
+                styles.drawerHeader,
+                {
+                  paddingTop: insets.top + theme.spacing.lg,
+                  paddingHorizontal: theme.spacing.lg,
+                  paddingBottom: theme.spacing.lg,
+                  borderBottomColor: theme.colors.divider,
+                },
+              ]}
+            >
+              <View style={styles.drawerHeaderContent}>
+                <Text
+                  style={[
+                    styles.drawerTitle,
+                    {
+                      color: theme.colors.text.primary,
+                      ...theme.typography.h5,
+                      fontWeight: '600',
+                    },
+                  ]}
+                >
+                  AI Chat
+                </Text>
+                <TouchableOpacity
+                  style={styles.drawerCloseButton}
+                  onPress={() => setShowDrawer(false)}
+                >
+                  <IconSymbol
+                    name="xmark"
+                    size={24}
+                    color={theme.colors.text.secondary}
+                  />
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Drawer Content */}
+            <View style={styles.drawerContent}>
+              {/* Settings Section */}
+              <View style={styles.drawerSection}>
+                <Text
+                  style={[
+                    styles.drawerSectionTitle,
+                    {
+                      color: theme.colors.text.secondary,
+                      ...theme.typography.caption,
+                      fontWeight: '600',
+                      marginBottom: theme.spacing.sm,
+                    },
+                  ]}
+                >
+                  SETTINGS
+                </Text>
+
+                <TouchableOpacity style={styles.drawerItem}>
+                  <IconSymbol
+                    name="gearshape"
+                    size={20}
+                    color={theme.colors.text.secondary}
+                  />
+                  <Text
+                    style={[
+                      styles.drawerItemText,
+                      {
+                        color: theme.colors.text.primary,
+                        ...theme.typography.body1,
+                        marginLeft: theme.spacing.md,
+                      },
+                    ]}
+                  >
+                    Settings
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.drawerItem}>
+                  <IconSymbol
+                    name="paintbrush"
+                    size={20}
+                    color={theme.colors.text.secondary}
+                  />
+                  <Text
+                    style={[
+                      styles.drawerItemText,
+                      {
+                        color: theme.colors.text.primary,
+                        ...theme.typography.body1,
+                        marginLeft: theme.spacing.md,
+                      },
+                    ]}
+                  >
+                    Theme
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Chat Section */}
+              <View style={styles.drawerSection}>
+                <Text
+                  style={[
+                    styles.drawerSectionTitle,
+                    {
+                      color: theme.colors.text.secondary,
+                      ...theme.typography.caption,
+                      fontWeight: '600',
+                      marginBottom: theme.spacing.sm,
+                    },
+                  ]}
+                >
+                  CHAT
+                </Text>
+
+                <TouchableOpacity style={styles.drawerItem}>
+                  <IconSymbol
+                    name="clock.arrow.circlepath"
+                    size={20}
+                    color={theme.colors.text.secondary}
+                  />
+                  <Text
+                    style={[
+                      styles.drawerItemText,
+                      {
+                        color: theme.colors.text.primary,
+                        ...theme.typography.body1,
+                        marginLeft: theme.spacing.md,
+                      },
+                    ]}
+                  >
+                    Chat History
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.drawerItem}>
+                  <IconSymbol
+                    name="trash"
+                    size={20}
+                    color={theme.colors.text.secondary}
+                  />
+                  <Text
+                    style={[
+                      styles.drawerItemText,
+                      {
+                        color: theme.colors.text.primary,
+                        ...theme.typography.body1,
+                        marginLeft: theme.spacing.md,
+                      },
+                    ]}
+                  >
+                    Clear Chat
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* About Section */}
+              <View style={styles.drawerSection}>
+                <Text
+                  style={[
+                    styles.drawerSectionTitle,
+                    {
+                      color: theme.colors.text.secondary,
+                      ...theme.typography.caption,
+                      fontWeight: '600',
+                      marginBottom: theme.spacing.sm,
+                    },
+                  ]}
+                >
+                  ABOUT
+                </Text>
+
+                <TouchableOpacity style={styles.drawerItem}>
+                  <IconSymbol
+                    name="info.circle"
+                    size={20}
+                    color={theme.colors.text.secondary}
+                  />
+                  <Text
+                    style={[
+                      styles.drawerItemText,
+                      {
+                        color: theme.colors.text.primary,
+                        ...theme.typography.body1,
+                        marginLeft: theme.spacing.md,
+                      },
+                    ]}
+                  >
+                    About
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.drawerItem}>
+                  <IconSymbol
+                    name="questionmark.circle"
+                    size={20}
+                    color={theme.colors.text.secondary}
+                  />
+                  <Text
+                    style={[
+                      styles.drawerItemText,
+                      {
+                        color: theme.colors.text.primary,
+                        ...theme.typography.body1,
+                        marginLeft: theme.spacing.md,
+                      },
+                    ]}
+                  >
+                    Help & Support
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Animated.View>
+        </View>
+      )}
     </View>
   );
 }
@@ -451,6 +704,67 @@ const styles = StyleSheet.create({
     // Styles applied inline for theme integration
   },
   modelOptionDescription: {
+    // Styles applied inline for theme integration
+  },
+  // Drawer styles
+  drawerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1000,
+  },
+  drawerBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  drawer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '70%',
+    height: '100%',
+    borderTopRightRadius: 0,
+    borderBottomRightRadius: 0,
+  },
+  drawerHeader: {
+    borderBottomWidth: 1,
+  },
+  drawerHeaderContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  drawerTitle: {
+    // Styles applied inline for theme integration
+  },
+  drawerCloseButton: {
+    padding: 8,
+  },
+  drawerContent: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
+  drawerSection: {
+    marginBottom: 24,
+  },
+  drawerSectionTitle: {
+    // Styles applied inline for theme integration
+  },
+  drawerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+  },
+  drawerItemText: {
     // Styles applied inline for theme integration
   },
 });
