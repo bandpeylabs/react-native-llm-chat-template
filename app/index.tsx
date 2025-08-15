@@ -584,9 +584,9 @@ export default function ChatScreen() {
             styles.inputContainer,
             {
               backgroundColor: theme.colors.surface,
-              borderTopColor: theme.colors.divider,
               paddingHorizontal: theme.spacing.md,
-              paddingVertical: theme.spacing.sm,
+              paddingVertical: theme.spacing.md,
+              paddingBottom: theme.spacing.lg,
             },
           ]}
         >
@@ -602,6 +602,7 @@ export default function ChatScreen() {
                 justifyContent: 'center',
                 alignItems: 'center',
                 marginRight: theme.spacing.sm,
+                alignSelf: 'flex-end',
               },
             ]}
             onPress={() => {
@@ -617,17 +618,19 @@ export default function ChatScreen() {
           </TouchableOpacity>
 
           {/* Text Input Container with Button Inside */}
-          <View
+          <Animated.View
             style={[
               styles.inputWrapper,
               {
                 backgroundColor: theme.colors.surfaceVariant,
-                borderRadius: theme.borderRadius.full,
+                borderRadius: inputText.includes('\n') ? 16 : 50,
                 flex: 1,
                 flexDirection: 'row',
                 alignItems: 'center',
                 paddingHorizontal: theme.spacing.md,
-                paddingVertical: theme.spacing.sm,
+                paddingVertical: inputText.includes('\n')
+                  ? theme.spacing.sm
+                  : 6,
               },
             ]}
           >
@@ -641,7 +644,8 @@ export default function ChatScreen() {
                   textAlignVertical: inputText ? 'top' : 'center',
                   paddingVertical: 0,
                   marginRight: theme.spacing.sm,
-                  minHeight: 20,
+                  minHeight: inputText.includes('\n') ? 40 : 20,
+                  maxHeight: inputText.includes('\n') ? 100 : 20,
                 },
               ]}
               value={inputText}
@@ -650,6 +654,7 @@ export default function ChatScreen() {
               placeholderTextColor={theme.colors.text.secondary}
               multiline
               maxLength={1000}
+              numberOfLines={5}
             />
 
             {/* Send/Microphone Button Inside Input */}
@@ -686,7 +691,7 @@ export default function ChatScreen() {
                 }
               />
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </View>
       </KeyboardAvoidingView>
 
@@ -1045,7 +1050,6 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    borderTopWidth: 1,
   },
   addImageButton: {
     // Styles applied inline for theme integration
@@ -1054,7 +1058,7 @@ const styles = StyleSheet.create({
     // Styles applied inline for theme integration
   },
   textInput: {
-    maxHeight: 100,
+    // Height constraints set inline for dynamic behavior
   },
   sendButton: {
     // Styles applied inline for theme integration
