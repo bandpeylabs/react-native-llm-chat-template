@@ -27,19 +27,14 @@ import {
 export default function ChatScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
-  const [messages, setMessages] = useState<ChatMessageType[]>([
-    {
-      id: '1',
-      text: "Hello! I'm your AI assistant. How can I help you today?",
-      sender: 'ai',
-      timestamp: new Date(),
-    },
-  ]);
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('llama');
+  const [selectedModel, setSelectedModel] = useState('gpt5');
   const [showModelDropdown, setShowModelDropdown] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
+  const [showChat, setShowChat] = useState(false);
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [modelButtonLayout, setModelButtonLayout] = useState({
     x: 0,
     y: 0,
@@ -48,9 +43,9 @@ export default function ChatScreen() {
   });
   const flatListRef = useRef<FlatList>(null);
   const drawerAnimation = useRef(new Animated.Value(-300)).current;
+  const moreOptionsAnimation = useRef(new Animated.Value(0)).current;
 
   const models = [
-    { id: 'llama', name: 'Llama', description: "Meta's Llama model" },
     { id: 'gpt4', name: 'GPT-4', description: "OpenAI's GPT-4 model" },
     { id: 'gpt4o', name: 'GPT-4o', description: "OpenAI's GPT-4o model" },
     { id: 'claude', name: 'Claude', description: "Anthropic's Claude model" },
@@ -58,6 +53,8 @@ export default function ChatScreen() {
   ];
 
   const currentModel = models.find((model) => model.id === selectedModel);
+
+  const hasInputText = inputText.trim() !== '';
 
   const sendMessage = async () => {
     if (inputText.trim() === '') return;
@@ -71,6 +68,7 @@ export default function ChatScreen() {
 
     setMessages((prev) => [...prev, userMessage]);
     setInputText('');
+    setShowChat(true);
     setIsTyping(true);
 
     // Simulate AI response
@@ -85,12 +83,6 @@ export default function ChatScreen() {
       setIsTyping(false);
     }, 1500);
   };
-
-  const renderMessage = ({ item }: { item: ChatMessageType }) => (
-    <ChatMessage message={item} />
-  );
-
-  const hasInputText = inputText.trim() !== '';
 
   // Drawer animation effects
   useEffect(() => {
@@ -108,6 +100,23 @@ export default function ChatScreen() {
       }).start();
     }
   }, [showDrawer, drawerAnimation]);
+
+  // More options animation effects
+  useEffect(() => {
+    if (showMoreOptions) {
+      Animated.timing(moreOptionsAnimation, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    } else {
+      Animated.timing(moreOptionsAnimation, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [showMoreOptions, moreOptionsAnimation]);
 
   return (
     <View
@@ -189,21 +198,386 @@ export default function ChatScreen() {
         style={styles.keyboardAvoidingView}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <FlatList
-          ref={flatListRef}
-          data={messages}
-          renderItem={renderMessage}
-          keyExtractor={(item) => item.id}
-          style={styles.messagesList}
-          contentContainerStyle={[
-            styles.messagesContent,
-            { paddingHorizontal: theme.spacing.md },
-          ]}
-          onContentSizeChange={() =>
-            flatListRef.current?.scrollToEnd({ animated: true })
-          }
-          ListFooterComponent={isTyping ? <TypingIndicator /> : null}
-        />
+        {/* Conditional Content: Suggestions or Chat */}
+        {!showChat ? (
+          <View style={styles.centeredContent}>
+            <Text
+              style={[
+                styles.mainPrompt,
+                {
+                  color: theme.colors.text.primary,
+                  ...theme.typography.h3,
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  marginBottom: theme.spacing.xl * 2,
+                },
+              ]}
+            >
+              What can I help with?
+            </Text>
+
+            {/* Action Buttons */}
+            <View style={styles.actionButtonsContainer}>
+              {/* First Row */}
+              <View style={styles.actionButtonRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.actionButton,
+                    {
+                      backgroundColor: theme.colors.surfaceVariant,
+                      borderColor: theme.colors.divider,
+                    },
+                  ]}
+                >
+                  <IconSymbol
+                    name="photo.fill"
+                    size={20}
+                    color={theme.colors.text.secondary}
+                  />
+                  <Text
+                    style={[
+                      styles.actionButtonText,
+                      {
+                        color: theme.colors.text.primary,
+                        ...theme.typography.body2,
+                        fontWeight: '500',
+                      },
+                    ]}
+                  >
+                    Create image
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.actionButton,
+                    {
+                      backgroundColor: theme.colors.surfaceVariant,
+                      borderColor: theme.colors.divider,
+                    },
+                  ]}
+                >
+                  <IconSymbol
+                    name="chevron.left.forwardslash.chevron.right"
+                    size={20}
+                    color={theme.colors.text.secondary}
+                  />
+                  <Text
+                    style={[
+                      styles.actionButtonText,
+                      {
+                        color: theme.colors.text.primary,
+                        ...theme.typography.body2,
+                        fontWeight: '500',
+                      },
+                    ]}
+                  >
+                    Code
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Second Row */}
+              <View style={styles.actionButtonRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.actionButton,
+                    {
+                      backgroundColor: theme.colors.surfaceVariant,
+                      borderColor: theme.colors.divider,
+                    },
+                  ]}
+                >
+                  <IconSymbol
+                    name="graduationcap"
+                    size={20}
+                    color={theme.colors.text.secondary}
+                  />
+                  <Text
+                    style={[
+                      styles.actionButtonText,
+                      {
+                        color: theme.colors.text.primary,
+                        ...theme.typography.body2,
+                        fontWeight: '500',
+                      },
+                    ]}
+                  >
+                    Get advice
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[
+                    styles.actionButton,
+                    {
+                      backgroundColor: theme.colors.surfaceVariant,
+                      borderColor: theme.colors.divider,
+                    },
+                  ]}
+                >
+                  <IconSymbol
+                    name="eye"
+                    size={20}
+                    color={theme.colors.text.secondary}
+                  />
+                  <Text
+                    style={[
+                      styles.actionButtonText,
+                      {
+                        color: theme.colors.text.primary,
+                        ...theme.typography.body2,
+                        fontWeight: '500',
+                      },
+                    ]}
+                  >
+                    Analyze images
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* More Button - Only show when options are collapsed */}
+              {!showMoreOptions && (
+                <View style={styles.actionButtonRow}>
+                  <TouchableOpacity
+                    style={[
+                      styles.moreButton,
+                      {
+                        borderColor: theme.colors.divider,
+                      },
+                    ]}
+                    onPress={() => setShowMoreOptions(true)}
+                  >
+                    <Text
+                      style={[
+                        styles.moreButtonText,
+                        {
+                          color: theme.colors.text.secondary,
+                          ...theme.typography.body2,
+                          fontWeight: '500',
+                        },
+                      ]}
+                    >
+                      More
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
+              {/* Expanded More Options */}
+              <Animated.View
+                style={[
+                  styles.expandedMoreOptions,
+                  {
+                    opacity: moreOptionsAnimation,
+                    maxHeight: moreOptionsAnimation.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, 400],
+                    }),
+                    transform: [
+                      {
+                        translateY: moreOptionsAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [20, 0],
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                {/* Row 3 */}
+                <View style={styles.actionButtonRow}>
+                  <TouchableOpacity
+                    style={[
+                      styles.actionButton,
+                      {
+                        backgroundColor: theme.colors.surfaceVariant,
+                        borderColor: theme.colors.divider,
+                      },
+                    ]}
+                  >
+                    <IconSymbol
+                      name="doc.text"
+                      size={20}
+                      color={theme.colors.text.secondary}
+                    />
+                    <Text
+                      style={[
+                        styles.actionButtonText,
+                        {
+                          color: theme.colors.text.primary,
+                          ...theme.typography.body2,
+                          fontWeight: '500',
+                        },
+                      ]}
+                    >
+                      Summarize text
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.actionButton,
+                      {
+                        backgroundColor: theme.colors.surfaceVariant,
+                        borderColor: theme.colors.divider,
+                      },
+                    ]}
+                  >
+                    <IconSymbol
+                      name="chart.bar"
+                      size={20}
+                      color={theme.colors.text.secondary}
+                    />
+                    <Text
+                      style={[
+                        styles.actionButtonText,
+                        {
+                          color: theme.colors.text.primary,
+                          ...theme.typography.body2,
+                          fontWeight: '500',
+                        },
+                      ]}
+                    >
+                      Analyze data
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Row 4 */}
+                <View style={styles.actionButtonRow}>
+                  <TouchableOpacity
+                    style={[
+                      styles.actionButton,
+                      {
+                        backgroundColor: theme.colors.surfaceVariant,
+                        borderColor: theme.colors.divider,
+                      },
+                    ]}
+                  >
+                    <IconSymbol
+                      name="gift"
+                      size={20}
+                      color={theme.colors.text.secondary}
+                    />
+                    <Text
+                      style={[
+                        styles.actionButtonText,
+                        {
+                          color: theme.colors.text.primary,
+                          ...theme.typography.body2,
+                          fontWeight: '500',
+                        },
+                      ]}
+                    >
+                      Surprise me
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.actionButton,
+                      {
+                        backgroundColor: theme.colors.surfaceVariant,
+                        borderColor: theme.colors.divider,
+                      },
+                    ]}
+                  >
+                    <IconSymbol
+                      name="pencil"
+                      size={20}
+                      color={theme.colors.text.secondary}
+                    />
+                    <Text
+                      style={[
+                        styles.actionButtonText,
+                        {
+                          color: theme.colors.text.primary,
+                          ...theme.typography.body2,
+                          fontWeight: '500',
+                        },
+                      ]}
+                    >
+                      Help me write
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Row 5 */}
+                <View style={styles.actionButtonRowLast}>
+                  <TouchableOpacity
+                    style={[
+                      styles.actionButton,
+                      {
+                        backgroundColor: theme.colors.surfaceVariant,
+                        borderColor: theme.colors.divider,
+                      },
+                    ]}
+                  >
+                    <IconSymbol
+                      name="lightbulb"
+                      size={20}
+                      color={theme.colors.text.secondary}
+                    />
+                    <Text
+                      style={[
+                        styles.actionButtonText,
+                        {
+                          color: theme.colors.text.primary,
+                          ...theme.typography.body2,
+                          fontWeight: '500',
+                        },
+                      ]}
+                    >
+                      Brainstorm
+                    </Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.actionButton,
+                      {
+                        backgroundColor: theme.colors.surfaceVariant,
+                        borderColor: theme.colors.divider,
+                      },
+                    ]}
+                  >
+                    <IconSymbol
+                      name="list.bullet"
+                      size={20}
+                      color={theme.colors.text.secondary}
+                    />
+                    <Text
+                      style={[
+                        styles.actionButtonText,
+                        {
+                          color: theme.colors.text.primary,
+                          ...theme.typography.body2,
+                          fontWeight: '500',
+                        },
+                      ]}
+                    >
+                      Make a plan
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </Animated.View>
+            </View>
+          </View>
+        ) : (
+          <View style={styles.chatContainer}>
+            <FlatList
+              ref={flatListRef}
+              data={messages}
+              renderItem={({ item }) => <ChatMessage message={item} />}
+              keyExtractor={(item) => item.id}
+              style={styles.messagesList}
+              contentContainerStyle={styles.messagesContent}
+              showsVerticalScrollIndicator={false}
+            />
+            {isTyping && <TypingIndicator />}
+          </View>
+        )}
 
         <View
           style={[
@@ -293,14 +667,14 @@ export default function ChatScreen() {
                   alignItems: 'center',
                 },
               ]}
-              onPress={
-                hasInputText
-                  ? sendMessage
-                  : () => {
-                      // TODO: Implement voice recording
-                      console.log('Voice recording pressed');
-                    }
-              }
+              onPress={() => {
+                if (hasInputText) {
+                  sendMessage();
+                } else {
+                  // TODO: Implement voice recording
+                  console.log('Voice recording pressed');
+                }
+              }}
             >
               <IconSymbol
                 name={hasInputText ? 'paperplane.fill' : 'mic.fill'}
@@ -766,5 +1140,69 @@ const styles = StyleSheet.create({
   },
   drawerItemText: {
     // Styles applied inline for theme integration
+  },
+  // Centered content styles
+  centeredContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  mainPrompt: {
+    // Styles applied inline for theme integration
+  },
+  actionButtonsContainer: {
+    alignItems: 'center',
+    width: '100%',
+  },
+  actionButtonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 16,
+    gap: 16,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 50,
+    borderWidth: 1,
+    minWidth: 120,
+    justifyContent: 'center',
+    gap: 8,
+  },
+  actionButtonText: {
+    // Styles applied inline for theme integration
+  },
+  moreButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 50,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    minWidth: 120,
+    justifyContent: 'center',
+  },
+  moreButtonText: {
+    // Styles applied inline for theme integration
+  },
+  // Chat styles
+  chatContainer: {
+    flex: 1,
+  },
+  // Expanded more options styles
+  expandedMoreOptions: {
+    overflow: 'hidden',
+    marginTop: 0,
+  },
+  // Last row in expanded options should have no bottom margin
+  actionButtonRowLast: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: 0,
+    gap: 16,
   },
 });
