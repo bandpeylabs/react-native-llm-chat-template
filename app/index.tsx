@@ -14,6 +14,7 @@ import {
   Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import ChatMessage from '@/src/components/ChatMessage';
 import TypingIndicator from '@/src/components/TypingIndicator';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -27,6 +28,7 @@ import {
 export default function ChatScreen() {
   const theme = useTheme();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const [inputText, setInputText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [selectedModel, setSelectedModel] = useState('gpt5');
@@ -35,6 +37,7 @@ export default function ChatScreen() {
   const [showChat, setShowChat] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const [inputHeight, setInputHeight] = useState(20);
   const [modelButtonLayout, setModelButtonLayout] = useState({
     x: 0,
     y: 0,
@@ -56,6 +59,13 @@ export default function ChatScreen() {
 
   const hasInputText = inputText.trim() !== '';
 
+  // Handle input height changes based on content
+  const handleContentSizeChange = (event: any) => {
+    const { height } = event.nativeEvent.contentSize;
+    const newHeight = Math.max(20, Math.min(100, height));
+    setInputHeight(newHeight);
+  };
+
   const sendMessage = async () => {
     if (inputText.trim() === '') return;
 
@@ -68,6 +78,7 @@ export default function ChatScreen() {
 
     setMessages((prev) => [...prev, userMessage]);
     setInputText('');
+    setInputHeight(20); // Reset input height
     setShowChat(true);
     setIsTyping(true);
 
@@ -623,14 +634,12 @@ export default function ChatScreen() {
               styles.inputWrapper,
               {
                 backgroundColor: theme.colors.surfaceVariant,
-                borderRadius: inputText.includes('\n') ? 16 : 50,
+                borderRadius: inputHeight > 20 ? 16 : 50,
                 flex: 1,
                 flexDirection: 'row',
                 alignItems: 'center',
                 paddingHorizontal: theme.spacing.md,
-                paddingVertical: inputText.includes('\n')
-                  ? theme.spacing.sm
-                  : 6,
+                paddingVertical: inputHeight > 20 ? theme.spacing.sm : 6,
               },
             ]}
           >
@@ -641,20 +650,22 @@ export default function ChatScreen() {
                   color: theme.colors.text.primary,
                   fontSize: theme.typography.body1.fontSize,
                   flex: 1,
-                  textAlignVertical: inputText ? 'top' : 'center',
+                  textAlignVertical: 'top',
                   paddingVertical: 0,
                   marginRight: theme.spacing.sm,
-                  minHeight: inputText.includes('\n') ? 40 : 20,
-                  maxHeight: inputText.includes('\n') ? 100 : 20,
+                  height: inputHeight,
+                  lineHeight: 20,
                 },
               ]}
               value={inputText}
               onChangeText={setInputText}
+              onContentSizeChange={handleContentSizeChange}
               placeholder="Ask anything..."
               placeholderTextColor={theme.colors.text.secondary}
               multiline
               maxLength={1000}
               numberOfLines={5}
+              textBreakStrategy="simple"
             />
 
             {/* Send/Microphone Button Inside Input */}
@@ -1012,6 +1023,51 @@ export default function ChatScreen() {
                   </Text>
                 </TouchableOpacity>
               </View>
+
+              {/* User Profile Section - Fixed at bottom */}
+              <View style={styles.userProfileSection}>
+                <TouchableOpacity
+                  style={styles.userProfileItem}
+                  onPress={() => {
+                    router.push('/settings');
+                    setShowDrawer(false);
+                  }}
+                >
+                  <View style={styles.userAvatar}>
+                    <Text
+                      style={[
+                        styles.userAvatarText,
+                        {
+                          color: theme.colors.text.inverse,
+                          ...theme.typography.body2,
+                          fontWeight: '600',
+                        },
+                      ]}
+                    >
+                      R
+                    </Text>
+                  </View>
+                  <View style={styles.userInfo}>
+                    <Text
+                      style={[
+                        styles.userName,
+                        {
+                          color: theme.colors.text.primary,
+                          ...theme.typography.body1,
+                          fontWeight: '500',
+                        },
+                      ]}
+                    >
+                      Roozbeh
+                    </Text>
+                  </View>
+                  <IconSymbol
+                    name="chevron.right"
+                    size={16}
+                    color={theme.colors.text.secondary}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
           </Animated.View>
         </View>
@@ -1208,5 +1264,37 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: 0,
     gap: 16,
+  },
+  // User profile styles
+  userProfileSection: {
+    marginTop: 'auto',
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  userProfileItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+  },
+  userAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#078DEE',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userAvatarText: {
+    // Styles applied inline for theme integration
+  },
+  userInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  userName: {
+    // Styles applied inline for theme integration
   },
 });
