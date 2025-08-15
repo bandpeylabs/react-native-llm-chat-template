@@ -51,6 +51,14 @@ const MAPPING: Record<string, string> = {
 
   // UI icons
   'chevron.left.forwardslash.chevron.right': 'code',
+
+  // New icons for settings
+  'phone.fill': 'phone',
+  'plus.square': 'add-box',
+  'heart.fill': 'favorite',
+  'bell.fill': 'notifications',
+  'shield.fill': 'security',
+  'arrow.right.square': 'exit-to-app',
 };
 
 /**
